@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import Image from "next/image";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/client";
+import { signIn, signUp } from "@/lib/actions/auth.action";
 
 const authFormSchema = (type: FormType) =>
   z.object({
@@ -36,19 +39,51 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      // Do something with the form values.
+      // ✅ This will be type-safe and validated.
       if (type === "sign-in") {
         // Handle sign-in logic
-        console.log("Signing in with values:", values);
-        // Call your sign-in API here
+        const { email, password } = values;
+
+        const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+        
+        const idToken = await userCredentials.user.getIdToken();
+
+        if (!idToken) {
+          toast.error("Failed to retrieve user id token.");
+          return;
+        }
+
+        await signIn({
+          email,
+          idToken,
+        });
+
         toast.success("Signed in successfully!");
         router.push("/"); // Redirect to dashboard or home page after sign-in
       } else {
-        // Handle sign-up logic
-        console.log("Signing up with values:", values);
+        const { name, email, password } = values;
+
+        const useCredentials = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        const result = await signUp({
+          uid: useCredentials.user.uid,
+          name: name!,
+          email: email,
+          password: password,
+        });
+
+        if (!result.success) {
+          toast.error(result?.message);
+          return;
+        }
+
         // Call your sign-up API here
         toast.success("Account created successfully! Please sign in.");
         router.push("/sign-in");

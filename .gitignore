@@ -31,7 +31,10 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+
+# Firebase Private Keys
+interview-prep-platform-3f688-firebase-adminsdk-fbsvc-675994d241.json
 
 # vercel
 .vercel
