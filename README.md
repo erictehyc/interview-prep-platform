@@ -18,3 +18,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## References
 - [JavaScript Mastery Video](https://www.youtube.com/watch?v=8GK8R77Bd7g&ab_channel=JavaScriptMastery)
+- [Vercel AI SDK](https://ai-sdk.dev/docs/introduction)
